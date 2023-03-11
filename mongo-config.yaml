@@ -1,0 +1,8 @@
+# obtained from kubernetes configmap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongo-config
+data:
+  #name of service file
+  mongo-url: mongo-serivce 

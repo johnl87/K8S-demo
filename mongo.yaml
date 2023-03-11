@@ -1,0 +1,55 @@
+# deployment and service for mongoDB
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deployment
+  labels:
+    app: mongo
+spec:
+  #replicas = how many pods to create
+  replicas: 1
+  selector:
+    #selector checks that all labels with the same match
+    #label will belong to the same deployment
+    matchLabels:
+      app: mongo
+  #template is the blueprint of pod(s)    
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:5.0
+        ports:
+          #port for mongodb
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-user
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-password              
+#yaml syntax with three dashes to seperate a file into two
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service
+spec:
+  selector:
+    app.kubernetes.io/name: mongo
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+      #targetport should be the same as container port
+      #targetport will fwd services to containerport
